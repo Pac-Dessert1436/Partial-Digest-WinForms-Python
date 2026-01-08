@@ -126,7 +126,7 @@ Public Module PartialDigestAlgorithm
             End If
         Loop
 
-        Return Array.Empty(Of Integer)
+        Return Array.Empty(Of Integer)()
     End Function
 
     ''' <summary>
@@ -137,7 +137,7 @@ Public Module PartialDigestAlgorithm
     <Runtime.CompilerServices.Extension>
     Public Function PartialDigest(fragmentLengths As Integer()) As Integer()
         Dim width As Integer = fragmentLengths.Max()
-        fragmentLengths = fragmentLengths.Where(Function(x) x <> width).ToArray()
+        fragmentLengths = Array.FindAll(fragmentLengths, Function(x) x <> width)
         Dim starter As New IntList From {0, width}
 
         Return FindSolution(width, fragmentLengths.ToList(), starter)
@@ -149,10 +149,10 @@ Public Module PartialDigestAlgorithm
     ''' <param name="myContent">The input string in the format [n1, n2, n3, ...].</param>
     ''' <returns>An array of integers parsed from the input string, or an empty array if parsing fails.</returns>
     ''' <exception cref="Exception">Thrown when the input string cannot be parsed into an array of integers.</exception>
-    Public Function ExtractArrayFromInput(myContent As String) As Integer()
+    Public Function ExtractArrayFromInput(content As String) As Integer()
         Try
-            Dim myArray As String() = myContent.Substring(1, myContent.Length - 2).Split(", ")
-            Return Array.ConvertAll(myArray, AddressOf Convert.ToInt32)
+            Return Aggregate itm In content.Substring(1, content.Length - 2).Split(","c)
+                Select CInt(itm.Trim()) Into ToArray()
         Catch ex As Exception
             MessageBox.Show(ex.ToString(), "Your input cannot be resolved for this reason:")
             Return Array.Empty(Of Integer)()
